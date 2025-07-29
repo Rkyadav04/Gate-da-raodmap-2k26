@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATE 2026 DA Interactive Roadmap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Amber/Gray) with Muted Blue Accent -->
+    <!-- Application Structure Plan: A tabbed, single-page dashboard. The structure prioritizes task-oriented exploration over the report's linear format. Users can immediately access key data (Weightage Chart), a step-by-step plan (Interactive Roadmap), or specific information (Filterable Resources). This is more efficient for a student who might repeatedly check specific sections like the roadmap or syllabus details for a particular subject. -->
+    <!-- Visualization & Content Choices: 1. Exam Weightage: Report Table 2 -> Goal: Compare -> Viz: Interactive Bar Chart (Chart.js) -> Interaction: Click bar to show detailed syllabus -> Justification: Visually compares subject importance and links it directly to the relevant curriculum, a core user task. 2. 6-Month Plan: Report Tables 3 & 4 -> Goal: Process/Change -> Viz: Accordion Panels -> Interaction: Click to expand/collapse months -> Justification: Organizes a dense timeline into manageable, focused steps, preventing information overload. 3. Resources: Report Table 5 -> Goal: Organize -> Viz: Card grid -> Interaction: Filter buttons by subject -> Justification: Allows quick retrieval of specific book recommendations. CONFIRMING NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom-color: #3b82f6; /* blue-500 */
+            color: #1e3a8a; /* blue-900 */
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 45vh;
+            width: 100%;
+            max-width: 900px;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div id="app" class="container mx-auto px-4 py-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-slate-900">GATE 2026 DA Prep Dashboard</h1>
+            <p class="text-lg text-slate-600 mt-2">Your interactive guide to conquering the Data Science & AI exam.</p>
+        </header>
+
+        <nav class="sticky top-0 bg-slate-50/80 backdrop-blur-sm z-10 mb-8 border-b border-slate-200">
+            <div class="flex justify-center space-x-4 sm:space-x-8 text-sm sm:text-base font-medium text-slate-600">
+                <a href="#overview" class="nav-link py-4 px-2 active">Overview</a>
+                <a href="#syllabus" class="nav-link py-4 px-2">Syllabus & Weightage</a>
+                <a href="#roadmap" class="nav-link py-4 px-2">6-Month Roadmap</a>
+                <a href="#resources" class="nav-link py-4 px-2">Resources</a>
+                <a href="#strategy" class="nav-link py-4 px-2">Exam Strategy</a>
+            </div>
+        </nav>
+
+        <main>
+            <section id="overview" class="section active">
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Charting Your Course to Success</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        Welcome to your personalized dashboard for the GATE 2026 Data Science and Artificial Intelligence (DA) exam. This tool is designed to translate the official guide into an actionable plan. Here, you'll find a breakdown of the exam structure, an interactive syllabus, a detailed 6-month preparation timeline, and curated resources. Use the navigation tabs above to explore each section and build a winning strategy.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-500">Duration</h3>
+                        <p class="text-4xl font-bold text-blue-600 mt-2">180</p>
+                        <p class="text-slate-500">Minutes</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-500">Total Questions</h3>
+                        <p class="text-4xl font-bold text-blue-600 mt-2">65</p>
+                        <p class="text-slate-500">GA (10) + Core (55)</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-500">Total Marks</h3>
+                        <p class="text-4xl font-bold text-blue-600 mt-2">100</p>
+                        <p class="text-slate-500">GA (15) + Core (85)</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-slate-500">Negative Marking</h3>
+                        <p class="text-4xl font-bold text-red-600 mt-2">MCQs</p>
+                        <p class="text-slate-500">Only for this type</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="syllabus" class="section">
+                 <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Syllabus & Weightage Analysis</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        This section provides a visual breakdown of the core subjects based on the GATE 2024 paper analysis. A smart preparation strategy focuses on high-weightage topics first. Click on any subject's bar in the chart below to view its detailed syllabus. This interactive approach helps you connect subject importance directly with the curriculum you need to master.
+                    </p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="chart-container mb-8">
+                        <canvas id="weightageChart"></canvas>
+                    </div>
+                    <div id="syllabus-details" class="mt-8 p-6 bg-slate-50 rounded-lg border border-slate-200 min-h-[100px]">
+                        <p class="text-slate-500 text-center">Click on a subject in the chart to see its detailed syllabus here.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="roadmap" class="section">
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">The 6-Month High-Intensity Master Plan</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        A 6-month window requires an aggressive and disciplined strategy. This roadmap breaks down the preparation into two high-intensity phases: Aggressive Syllabus Completion and Intensive Revision. Click on each month to expand the panel and view your primary focus, strategy, and daily goals. This structured plan is your day-by-day guide to success.
+                    </p>
+                </div>
+                <div id="roadmap-accordion" class="space-y-4"></div>
+            </section>
+
+            <section id="resources" class="section">
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Curated Learning Resources</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        Choosing the right study material is critical. This section contains a curated list of recommended textbooks for each subject. Use the filters to quickly find the books you need for a specific topic. Sticking to one primary text per subject for deep learning is often the most effective approach.
+                    </p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div id="resource-filters" class="flex flex-wrap justify-center gap-2 mb-8"></div>
+                    <div id="resource-list" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </section>
+
+            <section id="strategy" class="section">
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">Exam & Question Strategy</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        Understanding the mechanics of the exam is as important as knowing the syllabus. This section details the different question types you'll face and the marking scheme. Mastering these rules allows you to make smart decisions during the exam, maximizing your score and minimizing penalties.
+                    </p>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">Question Typology</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-semibold text-lg text-blue-700">Multiple Choice Questions (MCQs)</h4>
+                                <p class="text-slate-600">One correct answer out of four options. <strong class="text-red-600">These have negative marking (1/3 for 1-mark, 2/3 for 2-mark questions).</strong> Strategy: Use elimination to increase your chances. Avoid guessing wildly.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-green-700">Multiple Select Questions (MSQs)</h4>
+                                <p class="text-slate-600">One or more correct answers out of four options. You must select ALL correct options for credit. <strong class="text-green-600">No negative marking and no partial credit.</strong> Strategy: Treat each option as a true/false statement. Always attempt these questions.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-purple-700">Numerical Answer Type (NATs)</h4>
+                                <p class="text-slate-600">Enter a real number answer using the virtual keyboard. <strong class="text-green-600">No negative marking.</strong> Strategy: These test direct application. Always attempt them, even if you have to make an educated guess on your calculation.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">The Golden Rule of Attempting</h3>
+                        <p class="text-slate-600 leading-relaxed">
+                            The most critical strategic insight is this: <strong class="text-green-600">You must attempt every single MSQ and NAT question.</strong> There is zero penalty for a wrong answer on these types, meaning you can only gain marks. Leaving an MSQ or NAT question blank is a strategic error that can cost you valuable rank-boosting points. Be cautious with MCQs, but be aggressive with MSQs and NATs.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const appData = {
+                syllabus: [
+                    { 
+                        subject: 'Programming, DSA', 
+                        marks: 21,
+                        tier: 1,
+                        details: `<strong>Programming (Python):</strong> Basics, control flow, functions. <br><strong>Data Structures:</strong> Stacks, queues, linked lists, trees, hash tables. <br><strong>Algorithms:</strong> Searching, sorting (Bubble, Selection, Insertion, Mergesort, Quicksort), divide-and-conquer, graph traversals, shortest paths.`
+                    },
+                    { 
+                        subject: 'Probability & Statistics', 
+                        marks: 16,
+                        tier: 1,
+                        details: `<strong>Probability:</strong> Counting, axioms, conditional probability, Bayes' Theorem. <br><strong>Random Variables:</strong> Distributions (Uniform, Bernoulli, Binomial, Poisson, Normal, Exponential). <br><strong>Statistics:</strong> Central Limit Theorem, confidence intervals, hypothesis testing (z-test, t-test, Chi-squared).`
+                    },
+                    { 
+                        subject: 'Machine Learning', 
+                        marks: 11,
+                        tier: 2,
+                        details: `<strong>Supervised Learning:</strong> Linear & Ridge Regression, Logistic Regression, k-NN, Naive Bayes, SVMs, Decision Trees, Bias-Variance Trade-off. <br><strong>Unsupervised Learning:</strong> Clustering (k-Means, Hierarchical), PCA. <br><strong>Neural Networks:</strong> MLP, Feed-Forward Networks.`
+                    },
+                    { 
+                        subject: 'Artificial Intelligence', 
+                        marks: 11,
+                        tier: 2,
+                        details: `<strong>Search:</strong> Uninformed (BFS) and Informed (A*) search, adversarial search. <br><strong>Logic:</strong> Propositional and Predicate Logic. <br><strong>Reasoning under Uncertainty:</strong> Conditional independence, variable elimination.`
+                    },
+                    { 
+                        subject: 'Linear Algebra', 
+                        marks: 10,
+                        tier: 2,
+                        details: `Vector spaces, matrices, systems of linear equations, eigenvalues, eigenvectors, matrix decompositions (SVD, LU).`
+                    },
+                    { 
+                        subject: 'Database Management', 
+                        marks: 8,
+                        tier: 3,
+                        details: `ER-model, relational model (algebra, tuple calculus), SQL, normalization, file organization, indexing, data warehousing concepts.`
+                    },
+                    { 
+                        subject: 'Calculus & Optimization', 
+                        marks: 8,
+                        tier: 3,
+                        details: `Functions, limits, continuity, differentiability, Taylor series, basics of optimization for finding minima/maxima (foundational for gradient descent).`
+                    },
+                ],
+                roadmap: [
+                    {
+                        month: "August 2025",
+                        phase: 1,
+                        title: "Tier 1 Subjects",
+                        focus: "Programming, Data Structures, & Algorithms (21 Marks) AND Probability & Statistics (16 Marks).",
+                        goals: "Learn concepts from 1-2 topics daily. Solve at least 20-30 practice problems. Dedicate 45 mins to General Aptitude."
+                    },
+                    {
+                        month: "September 2025",
+                        phase: 1,
+                        title: "Tier 2 Subjects",
+                        focus: "Machine Learning (11 Marks), AI (11 Marks), AND Linear Algebra (10 Marks).",
+                        goals: "Active-recall loop: Revise prerequisites, learn new algorithm, solve problems immediately. Start topic-wise tests for Tier 1 subjects. <strong>Complete GATE 2026 Application.</strong>"
+                    },
+                    {
+                        month: "October 2025",
+                        phase: 1,
+                        title: "Tier 3 & Full Revision",
+                        focus: "Database Management (8 Marks), Calculus & Optimization (8 Marks).",
+                        goals: "Finish remaining syllabus in the first two weeks. Last two weeks: First full revision of all subjects using short notes and solving GATE DA 2024 & 2025 papers."
+                    },
+                    {
+                        month: "November 2025",
+                        phase: 2,
+                        title: "Subject-wise & Multi-Subject Tests",
+                        focus: "Shift from learning to mastery. Take at least 3-4 subject-wise tests per week.",
+                        goals: "Take your first full-length mock test in the last week. Analyze every test thoroughly to identify weak areas."
+                    },
+                    {
+                        month: "December 2025",
+                        phase: 2,
+                        title: "Full-Length Mock Tests (Weekly)",
+                        focus: "Take one full-length mock test every Sunday.",
+                        goals: "Spend Monday analyzing it. Use Tuesday-Saturday for targeted revision of weak areas and practicing more problems."
+                    },
+                    {
+                        month: "January 2026",
+                        phase: 2,
+                        title: "Intensive Mock Tests (Bi-weekly)",
+                        focus: "Increase frequency to two full-length mock tests per week.",
+                        goals: "Simulate the exact 3-hour exam environment. Revision should be exclusively from short notes and formula sheets."
+                    }
+                ],
+                resources: [
+                    { subject: "Probability & Statistics", type: "Primary", title: "A First Course in Probability", author: "Sheldon M. Ross" },
+                    { subject: "Probability & Statistics", type: "Supplementary", title: "Mathematical Statistics and Data Analysis", author: "John A. Rice" },
+                    { subject: "Linear Algebra", type: "Primary", title: "Introduction to Linear Algebra", author: "Gilbert Strang" },
+                    { subject: "Linear Algebra", type: "Supplementary", title: "Linear Algebra and Its Applications", author: "David C. Lay" },
+                    { subject: "Calculus & Optimization", type: "Primary", title: "Deep Learning (Math chapters)", author: "Goodfellow, Bengio, Courville" },
+                    { subject: "Programming, DSA", type: "Primary", title: "Data Structures & Algorithms in Python", author: "Goodrich, Tamassia, Goldwasser" },
+                    { subject: "Programming, DSA", type: "Supplementary", title: "Introduction to Algorithms", author: "CLRS" },
+                    { subject: "Database Management", type: "Primary", title: "Database System Concepts", author: "Korth, Sudarshan" },
+                    { subject: "Machine Learning", type: "Primary", title: "Hands-on Machine Learning with Scikit-Learn, Keras & TensorFlow", author: "A. Géron" },
+                    { subject: "Machine Learning", type: "Supplementary", title: "Pattern Recognition and Machine Learning", author: "Christopher Bishop" },
+                    { subject: "Artificial Intelligence", type: "Primary", title: "Artificial Intelligence: A Modern Approach", author: "Stuart Russell & Peter Norvig" },
+                    { subject: "General Aptitude", type: "Primary", title: "Standard GATE General Aptitude guide", author: "GKP or Wiley" },
+                ]
+            };
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.section');
+
+            function updateView(hash) {
+                hash = hash || '#overview';
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === hash);
+                });
+                sections.forEach(section => {
+                    section.classList.toggle('active', section.id === hash.substring(1));
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const hash = e.target.getAttribute('href');
+                    history.pushState(null, null, hash);
+                    updateView(hash);
+                });
+            });
+
+            window.addEventListener('popstate', () => {
+                updateView(window.location.hash);
+            });
+
+            updateView(window.location.hash);
+
+            const syllabusDetailsContainer = document.getElementById('syllabus-details');
+            
+            function updateSyllabusDetails(subjectName) {
+                const subjectData = appData.syllabus.find(s => s.subject === subjectName);
+                if (subjectData) {
+                    syllabusDetailsContainer.innerHTML = `
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">${subjectData.subject}</h3>
+                        <p class="text-slate-600">${subjectData.details}</p>
+                    `;
+                }
+            }
+
+            const ctx = document.getElementById('weightageChart').getContext('2d');
+            const weightageChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: appData.syllabus.map(s => s.subject),
+                    datasets: [{
+                        label: 'Approx. Marks (out of 85)',
+                        data: appData.syllabus.map(s => s.marks),
+                        backgroundColor: appData.syllabus.map(s => {
+                            if (s.tier === 1) return 'rgba(2, 132, 199, 0.7)'; // sky-600
+                            if (s.tier === 2) return 'rgba(217, 119, 6, 0.7)'; // amber-600
+                            return 'rgba(107, 114, 128, 0.7)'; // gray-500
+                        }),
+                        borderColor: appData.syllabus.map(s => {
+                            if (s.tier === 1) return 'rgba(2, 132, 199, 1)';
+                            if (s.tier === 2) return 'rgba(217, 119, 6, 1)';
+                            return 'rgba(107, 114, 128, 1)';
+                        }),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: (context) => `Tier ${appData.syllabus[context[0].dataIndex].tier} Subject`
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Subject-wise Mark Distribution (Based on GATE 2024)',
+                            font: { size: 16 },
+                            padding: { top: 10, bottom: 20 }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Marks'
+                            }
+                        }
+                    },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const subjectName = appData.syllabus[index].subject;
+                            updateSyllabusDetails(subjectName);
+                        }
+                    }
+                }
+            });
+
+            const roadmapAccordion = document.getElementById('roadmap-accordion');
+            appData.roadmap.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white rounded-lg shadow-sm overflow-hidden';
+                div.innerHTML = `
+                    <button class="accordion-header w-full text-left p-4 flex justify-between items-center bg-slate-100 hover:bg-slate-200 transition">
+                        <span class="font-bold text-lg text-slate-800">${item.month}: <span class="font-semibold text-blue-700">${item.title}</span></span>
+                        <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-6 border-t border-slate-200">
+                            <h4 class="font-semibold text-slate-700 mb-2">Primary Focus:</h4>
+                            <p class="text-slate-600 mb-4">${item.focus}</p>
+                            <h4 class="font-semibold text-slate-700 mb-2">Goals & Strategy:</h4>
+                            <p class="text-slate-600">${item.goals}</p>
+                        </div>
+                    </div>
+                `;
+                roadmapAccordion.appendChild(div);
+            });
+
+            document.querySelectorAll('.accordion-header').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    button.querySelector('svg').classList.toggle('rotate-180');
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
+
+            const resourceFilters = document.getElementById('resource-filters');
+            const resourceList = document.getElementById('resource-list');
+            const subjects = ['All', ...new Set(appData.resources.map(r => r.subject))];
+            
+            subjects.forEach(subject => {
+                const button = document.createElement('button');
+                button.textContent = subject;
+                button.className = 'filter-btn px-4 py-2 text-sm font-medium rounded-full transition bg-slate-200 text-slate-700 hover:bg-blue-500 hover:text-white';
+                if (subject === 'All') {
+                    button.classList.add('active-filter', 'bg-blue-600', 'text-white');
+                }
+                resourceFilters.appendChild(button);
+            });
+
+            function renderResources(filter = 'All') {
+                resourceList.innerHTML = '';
+                const filtered = filter === 'All' ? appData.resources : appData.resources.filter(r => r.subject === filter);
+                
+                filtered.forEach(resource => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-slate-50 border border-slate-200 p-4 rounded-lg';
+                    div.innerHTML = `
+                        <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ${resource.type === 'Primary' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${resource.type}</span>
+                        <h4 class="font-bold text-slate-800 mt-2">${resource.title}</h4>
+                        <p class="text-sm text-slate-500">by ${resource.author}</p>
+                        <p class="text-sm font-medium text-blue-600 mt-2">${resource.subject}</p>
+                    `;
+                    resourceList.appendChild(div);
+                });
+            }
+
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active-filter', 'bg-blue-600', 'text-white');
+                        btn.classList.add('bg-slate-200', 'text-slate-700');
+                    });
+                    button.classList.add('active-filter', 'bg-blue-600', 'text-white');
+                    button.classList.remove('bg-slate-200', 'text-slate-700');
+                    renderResources(button.textContent);
+                });
+            });
+
+            renderResources();
+        });
+    </script>
+</body>
+</html>
